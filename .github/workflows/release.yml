@@ -45,7 +45,20 @@ jobs:
 
             - name: Build and publish package
               run: |
+                  npm version patch -m "Release version %s" -m "[skip ci]"
                   npm run build
                   npm publish --provenance --access public
               env:
                 NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH }}
+
+            - name: Extract git branch
+              run: |
+                  # Short name for current branch. For PRs, use target branch (base ref)
+                  GIT_BRANCH=${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
+                  echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
+
+            - name: Git push
+              run: |
+                  echo "Current branch $GIT_BRANCH"
+                  git push origin $GIT_BRANCH
+                  git push origin $GIT_BRANCH --tags
