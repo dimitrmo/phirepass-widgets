@@ -50,7 +50,7 @@ jobs:
 
             - name: Build and publish package
               run: |
-                  npm version patch -m "Release version %s
+                  npm version patch -m "Release %s
 
                   [skip ci]"
 
