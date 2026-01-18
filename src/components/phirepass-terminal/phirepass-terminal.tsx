@@ -209,8 +209,12 @@ export class PhirepassTerminal {
     }
 
     destroy_terminal() {
-        this.terminal.reset();
-        this.terminal.dispose();
+        if (this.terminal) {
+            this.terminal.reset();
+            if (typeof this.terminal.dispose === 'function') {
+                this.terminal.dispose();
+            }
+        }
     }
 
     open_comms() {
