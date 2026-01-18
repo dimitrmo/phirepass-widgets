@@ -27,6 +27,11 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
+            - name: Git setup
+              run: |
+                  git config user.name "$CARGO_TAG_NAME"
+                  git config user.email "$CARGO_TAG_EMAIL"
+
             - uses: oven-sh/setup-bun@v2
               with:
                 bun-version: latest
