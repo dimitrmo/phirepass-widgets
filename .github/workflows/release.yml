@@ -50,8 +50,12 @@ jobs:
 
             - name: Build and publish package
               run: |
-                  npm version patch -m "Release version %s" -m "[skip ci]"
-                  npm run build
+                  npm version patch -m "Release version %s
+
+                  [skip ci]"
+
+                  npm run build:prod
+
                   npm publish --provenance --access public
               env:
                 NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH }}
