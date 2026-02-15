@@ -38,7 +38,6 @@ export class PhirepassTerminal {
     private usernameBuffer = "";
     private passwordBuffer = "";
 
-
     private xtermImageSettings: IImageAddonOptions = {
         enableSizeReports: true,    // whether to enable CSI t reports (see below)
         pixelLimit: 16777216,       // max. pixel size of a single image
@@ -218,7 +217,7 @@ export class PhirepassTerminal {
     }
 
     open_comms() {
-        this.channel = new PhirepassChannel(`${this.createWebSocketEndpoint()}/api/web/ws`);
+        this.channel = new PhirepassChannel(`${this.createWebSocketEndpoint()}/api/web/ws`, this.nodeId!);
 
         this.channel.on_connection_open(() => {
             this.channel.start_heartbeat(this.heartbeatInterval <= 15_000 ? 30_000 : this.heartbeatInterval);
