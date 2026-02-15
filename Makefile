@@ -5,5 +5,6 @@ prod: build
 
 run:
 	bun run start
+
 test:
 	npm test

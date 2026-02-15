@@ -76,17 +76,26 @@ declare namespace LocalJSX {
          */
         "terminalOptions"?: { termName: string; rendererType: string; allowTransparency: boolean; fontFamily: string; fontSize: number; letterSpacing: number; lineHeight: number; allowProposedApi: boolean; cursorBlink: boolean; cursorWidth: number; theme: { background: string; foreground: string; cursor: string; }; scrollback: number; fastScrollModifier: string; fastScrollSensitivity: number; bellStyle: string; convertEol: boolean; disableStdin: boolean; rightClickSelectsWord: boolean; drawBoldTextInBrightColors: boolean; minimumContrastRatio: number; windowsMode: boolean; macOptionIsMeta: boolean; altClickMovesCursor: boolean; };
     }
+
+    interface PhirepassTerminalAttributes {
+        "serverHost": string;
+        "serverPort": number;
+        "allowInsecure": boolean;
+        "heartbeatInterval": number;
+        "nodeId": string;
+    }
+
     interface IntrinsicElements {
         "phirepass-sftp-client": PhirepassSftpClient;
-        "phirepass-terminal": PhirepassTerminal;
+        "phirepass-terminal": Omit<PhirepassTerminal, keyof PhirepassTerminalAttributes> & { [K in keyof PhirepassTerminal & keyof PhirepassTerminalAttributes]?: PhirepassTerminal[K] } & { [K in keyof PhirepassTerminal & keyof PhirepassTerminalAttributes as `attr:${K}`]?: PhirepassTerminalAttributes[K] } & { [K in keyof PhirepassTerminal & keyof PhirepassTerminalAttributes as `prop:${K}`]?: PhirepassTerminal[K] };
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "phirepass-sftp-client": LocalJSX.PhirepassSftpClient & JSXBase.HTMLAttributes<HTMLPhirepassSftpClientElement>;
-            "phirepass-terminal": LocalJSX.PhirepassTerminal & JSXBase.HTMLAttributes<HTMLPhirepassTerminalElement>;
+            "phirepass-sftp-client": LocalJSX.IntrinsicElements["phirepass-sftp-client"] & JSXBase.HTMLAttributes<HTMLPhirepassSftpClientElement>;
+            "phirepass-terminal": LocalJSX.IntrinsicElements["phirepass-terminal"] & JSXBase.HTMLAttributes<HTMLPhirepassTerminalElement>;
         }
     }
 }
