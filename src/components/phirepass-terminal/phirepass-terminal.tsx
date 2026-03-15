@@ -109,7 +109,7 @@ export class PhirepassTerminal {
     }
 
     @Prop()
-    serverHost = "phirepass.io";
+    serverHost = "phirepass.com";
 
     @Prop()
     serverPort = 443;

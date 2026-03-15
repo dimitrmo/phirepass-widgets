@@ -19,7 +19,7 @@ export namespace Components {
         "heartbeatInterval": number;
         "nodeId"?: string;
         /**
-          * @default "phirepass.io"
+          * @default "phirepass.com"
          */
         "serverHost": string;
         "serverId"?: string;
@@ -65,7 +65,7 @@ declare namespace LocalJSX {
         "heartbeatInterval"?: number;
         "nodeId"?: string;
         /**
-          * @default "phirepass.io"
+          * @default "phirepass.com"
          */
         "serverHost"?: string;
         "serverId"?: string;
