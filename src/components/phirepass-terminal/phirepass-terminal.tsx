@@ -371,8 +371,10 @@ export class PhirepassTerminal {
 
     connect() {
         const container = this.el.shadowRoot.getElementById('ccc');
+        console.log('Attempting to connect terminal to container:', container);
         if (container) {
             this.terminal.open(container);
+            console.log('Terminal opened in container');
             this.fitAddon.fit();
             this.terminal.focus();
             this.terminal.onData(this.handleTerminalData.bind(this));
