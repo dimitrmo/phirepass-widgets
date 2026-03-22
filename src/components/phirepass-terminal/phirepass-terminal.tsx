@@ -30,6 +30,10 @@ export class PhirepassTerminal {
     private imageAddon?: ImageAddon;
 
     private channel: PhirepassChannel;
+    private containerEl?: HTMLDivElement;
+    private domReady = false;
+    private runtimeReady = false;
+    private connected = false;
     private inputMode: InputMode = InputMode.Default;
     private resizeObserver: ResizeObserver;
     private resizeDebounceHandle?: ReturnType<typeof setTimeout> | number;
@@ -177,21 +181,42 @@ export class PhirepassTerminal {
         console.log('Terminal setup complete');
         this.open_comms();
         console.log('Comms opened');
+        this.runtimeReady = true;
 
         if (!this.nodeId) {
             console.warn('Prop node_id is not set. Cannot connect to terminal.');
             return;
         }
 
-        this.connect();
+        this.try_connect();
+    }
+
+    componentDidLoad() {
+        this.domReady = true;
+        this.try_connect();
     }
 
     async disconnectedCallback() {
         if (this.resizeObserver) {
             this.resizeObserver.disconnect();
         }
+        this.connected = false;
+        this.domReady = false;
+        this.runtimeReady = false;
         this.close_comms();
         this.destroy_terminal();
+    }
+
+    private try_connect() {
+        if (this.connected || !this.domReady || !this.runtimeReady) {
+            return;
+        }
+
+        if (!this.containerEl || !this.terminal || !this.channel) {
+            return;
+        }
+
+        this.connect();
     }
 
     setup_terminal() {
@@ -370,7 +395,7 @@ export class PhirepassTerminal {
     }
 
     connect() {
-        const container = this.el.shadowRoot.getElementById('ccc');
+        const container = this.containerEl;
         console.log('Attempting to connect terminal to container:', container);
         if (container) {
             this.terminal.open(container);
@@ -380,6 +405,7 @@ export class PhirepassTerminal {
             this.terminal.onData(this.handleTerminalData.bind(this));
             this.channel.connect();
             this.setupResizeObserver();
+            this.connected = true;
             console.log('Terminal connected and ready');
         }
     }
@@ -511,7 +537,7 @@ export class PhirepassTerminal {
 
     render() {
         return (
-            <Host><div id="ccc"></div></Host>
+            <Host><div id="ccc" ref={el => (this.containerEl = el as HTMLDivElement)}></div></Host>
         );
     }
 }
