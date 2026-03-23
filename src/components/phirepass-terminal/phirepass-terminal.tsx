@@ -317,6 +317,7 @@ export class PhirepassTerminal {
         }
 
         try {
+            console.log(`Sending terminal resize: cols=${cols}, rows=${rows}`);
             this.channel.send_ssh_terminal_resize(this.nodeId!, this.session_id, cols, rows);
         } catch (err) {
             console.error('Failed to send terminal resize:', err);
