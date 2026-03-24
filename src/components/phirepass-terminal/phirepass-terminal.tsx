@@ -417,6 +417,8 @@ export class PhirepassTerminal {
 
         this.terminal.reset();
         this.terminal.writeln("Connection closed.");
+
+        this.channel.disconnect();
     }
 
     private connect() {
