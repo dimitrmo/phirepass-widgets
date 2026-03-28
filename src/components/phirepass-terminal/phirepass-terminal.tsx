@@ -256,9 +256,11 @@ export class PhirepassTerminal {
             console.warn('WebGL addon not available or failed to load:', e);
         }
 
-        this.terminal.onResize(() => {
-            this.send_ssh_terminal_resize();
-        });
+        if (typeof this.terminal.onResize === 'function') {
+            this.terminal.onResize(() => {
+                this.send_ssh_terminal_resize();
+            });
+        }
     }
 
     private destroy_terminal() {
