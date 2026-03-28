@@ -256,7 +256,9 @@ export class PhirepassTerminal {
             console.warn('WebGL addon not available or failed to load:', e);
         }
 
-        this.fitAddon.fit();
+        this.terminal.onResize(() => {
+            this.send_ssh_terminal_resize();
+        });
     }
 
     private destroy_terminal() {
@@ -343,6 +345,8 @@ export class PhirepassTerminal {
             return;
         }
 
+        this.fitAddon.fit();
+
         const cols = this.terminal?.cols ?? 0;
         const rows = this.terminal?.rows ?? 0;
         const px_width = this.containerEl.clientWidth ?? 0;
@@ -355,15 +359,15 @@ export class PhirepassTerminal {
 
         try {
             console.log(`Sending terminal resize: cols=${cols}, rows=${rows}, px_width=${px_width}, px_height=${px_height}`);
-            this.channel.send_ssh_terminal_resize(this.nodeId!, this.session_id, cols, rows, px_width, px_height);
+            this.channel.send_ssh_terminal_resize(this.nodeId, this.session_id, cols, rows, px_width, px_height);
         } catch (err) {
             console.error('Failed to send terminal resize:', err);
         }
     }
 
     private send_ssh_data(data: string) {
-        if (this.channel.is_connected() && this.session_id) {
-            this.channel.send_ssh_tunnel_data(this.nodeId!, this.session_id, data);
+        if (this.channel.is_connected() && !!this.session_id) {
+            this.channel.send_ssh_tunnel_data(this.nodeId, this.session_id, data);
         }
     }
 
@@ -426,6 +430,7 @@ export class PhirepassTerminal {
     private handle_tunnel_opened(web: ProtocolMessageWebTunnelOpened) {
         this.session_id = web.sid;
         this.terminal.reset();
+        this.fitAddon.fit();
         this.send_ssh_terminal_resize();
     }
 
@@ -475,7 +480,7 @@ export class PhirepassTerminal {
             }, 100);
         });
 
-        this.resizeObserver.observe(this.el);
+        this.resizeObserver.observe(this.containerEl ?? this.el);
     }
 
     private handle_terminal_data(data: string) {
