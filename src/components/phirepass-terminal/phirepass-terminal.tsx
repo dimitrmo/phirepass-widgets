@@ -354,8 +354,8 @@ export class PhirepassTerminal {
         const px_width = this.containerEl.clientWidth ?? 0;
         const px_height = this.containerEl.clientHeight ?? 0;
 
-        if (cols <= 0 || rows <= 0) {
-            console.warn('Cannot send terminal resize: invalid terminal dimensions (cols:', cols, 'rows:', rows, ') ');
+        if (cols <= 0 || rows <= 0 || px_width <= 0 || px_height <= 0) {
+            console.warn(`Cannot send terminal resize: invalid terminal dimensions cols=${cols}, rows=${rows}, px_width=${px_width}, px_height=${px_height}`);
             return;
         }
 
