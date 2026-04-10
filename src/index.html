@@ -155,5 +155,10 @@
         node-id="456b5a3e-c32e-4bde-87e0-e6430558f4e0"
         token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyNzFmZjM0Ni0wOWY4LTQ1MjUtOWIzZi0xMzVjNGNjYTZjNWEiLCJwcm92aWRlciI6ImdpdGh1YiIsImlhdCI6MTc3NDY3OTE1NywiZXhwIjoxNzc1MjgzOTU3fQ.97xpC-uaGNzgbHEwE9G9tJobUsWAa1Gb7TtAnHXqdVk" node-id="5e8d7040-af50-4aa5-b8a9-9e8dcc34923e"> </phirepass-terminal>
         </div>
+    <script>
+        document.getElementsByTagName('phirepass-terminal')[0].addEventListener('connectionStateChanged', (state) => {
+            console.log('State changed', state);
+        });
+    </script>
   </body>
 </html>
