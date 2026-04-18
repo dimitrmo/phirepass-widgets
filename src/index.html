@@ -169,15 +169,21 @@
     <div class="client">
       <phirepass-sftp-client> </phirepass-sftp-client>
       <script>
-        const client = document.querySelector('phirepass-sftp-client');
+        (async () => {
+          const client = document.querySelector('phirepass-sftp-client');
+          await customElements.whenDefined('phirepass-sftp-client');
+          await client.componentOnReady?.();
 
-        client.addEventListener('maximize', event => {
+          client.addEventListener('maximize', async event => {
             if (event.detail) {
-                client.maximize();
+              client.maximize();
             } else {
-                client.minimize();
+              client.minimize();
             }
-        });
+          });
+
+          client.showLogin(true, true);
+        })();
       </script>
     </div>
   </body>
