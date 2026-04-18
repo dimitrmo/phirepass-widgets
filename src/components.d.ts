@@ -17,10 +17,7 @@ export namespace Components {
           * @default 'SFTP'
          */
         "name": string;
-        /**
-          * @default false
-         */
-        "showLoginScreen": boolean;
+        "showLogin": (username?: boolean, password?: boolean) => Promise<void>;
     }
     interface PhirepassTerminal {
         /**
@@ -109,10 +106,6 @@ declare namespace LocalJSX {
          */
         "name"?: string;
         "onMaximize"?: (event: PhirepassSftpClientCustomEvent<any>) => void;
-        /**
-          * @default false
-         */
-        "showLoginScreen"?: boolean;
     }
     interface PhirepassTerminal {
         /**
@@ -144,7 +137,6 @@ declare namespace LocalJSX {
     interface PhirepassSftpClientAttributes {
         "name": string;
         "description": string;
-        "showLoginScreen": boolean;
     }
     interface PhirepassTerminalAttributes {
         "serverHost": string;

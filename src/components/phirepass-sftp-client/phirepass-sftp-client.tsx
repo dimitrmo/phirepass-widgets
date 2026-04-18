@@ -19,12 +19,6 @@ export class PhirepassSftpClient {
     @Prop()
     description = 'Client';
 
-    @Prop({
-        mutable: true,
-        reflect: true,
-    })
-    showLoginScreen = false;
-
     @State()
     max = false;
 
@@ -46,13 +40,24 @@ export class PhirepassSftpClient {
         this.max = false;
     }
 
-    private toggleMax() {
-        this.maximizeEvent?.emit(!this.max);
+    @Method()
+    async showLogin(username = true, password = true) {
+        this.show_login_screen_username = username;
+        this.show_login_screen_password = password;
+        this.show_login_screen = true;
     }
 
-    private connect() {
-        console.log('connecting...');
-        this.showLoginScreen = false;
+    @State()
+    show_login_screen = false;
+
+    @State()
+    show_login_screen_username = false;
+
+    @State()
+    show_login_screen_password = false;
+
+    private toggle_max() {
+        this.maximizeEvent?.emit(!this.max);
     }
 
     render() {
@@ -71,7 +76,7 @@ export class PhirepassSftpClient {
                             </div>
                         </section>
                         <section class="actions">
-                            <div class="action" onClick={() => this.toggleMax()}>
+                            <div class="action" onClick={() => this.toggle_max()}>
                                 <img src={max} alt="Maximize" />
                             </div>
                         </section>
@@ -81,15 +86,12 @@ export class PhirepassSftpClient {
                 </section>
                 <section class={{
                     'creds': true,
-                    'blurred': this.showLoginScreen,
+                    'blurred': this.show_login_screen,
                 }}>
-                    {this.showLoginScreen && <div class="form">
-                        <input type="text" placeholder="Host" />
+                    {this.show_login_screen && <form class="form">
                         <input type="text" placeholder="Username" />
                         <input type="password" placeholder="Password" />
-                        <input type="text" placeholder="Port" />
-                        <button onClick={() => this.connect()}>Connect</button>
-                    </div>}
+                    </form>}
                 </section>
             </Host>
         );
