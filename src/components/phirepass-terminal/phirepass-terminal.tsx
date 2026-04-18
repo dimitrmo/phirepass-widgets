@@ -383,7 +383,6 @@ export class PhirepassTerminal {
     }
 
     private handle_error(error: ProtocolMessageWebError) {
-        console.log('Handling protocol error message:', error);
         switch (error.kind) {
             case ProtocolMessageError.Generic:
             case ProtocolMessageError.Authentication:
@@ -394,7 +393,6 @@ export class PhirepassTerminal {
                 this.passwordBuffer = "";
                 break;
             case ProtocolMessageError.RequiresUsernamePassword:
-                console.log('Server requires both username and password. Prompting for username first.');
             case ProtocolMessageError.RequiresUsername:
                 this.terminal.reset();
                 this.inputMode = InputMode.Username;
