@@ -143,22 +143,38 @@
         border-collapse: collapse;
         border-spacing: 0;
       }
+
+      :root {
+        --background: 220 20% 7%;
+        --foreground: 160 30% 80%;
+      }
+
+      body {
+        background-color: hsl(var(--background));
+        color: hsl(var(--foreground));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .client {
+        height: 500px;
+        width: 700px;
+        display: flex;
+      }
     </style>
   </head>
 
   <body>
-    <div style="width:800px;height:600px;">
-    <phirepass-terminal
-        server-host="localhost"
-        server-port="8080"
-        allow-insecure
-        node-id="456b5a3e-c32e-4bde-87e0-e6430558f4e0"
-        token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyNzFmZjM0Ni0wOWY4LTQ1MjUtOWIzZi0xMzVjNGNjYTZjNWEiLCJwcm92aWRlciI6ImdpdGh1YiIsImlhdCI6MTc3NDY3OTE1NywiZXhwIjoxNzc1MjgzOTU3fQ.97xpC-uaGNzgbHEwE9G9tJobUsWAa1Gb7TtAnHXqdVk" node-id="5e8d7040-af50-4aa5-b8a9-9e8dcc34923e"> </phirepass-terminal>
-        </div>
-    <script>
-        document.getElementsByTagName('phirepass-terminal')[0].addEventListener('connectionStateChanged', (state) => {
-            console.log('State changed', state);
+    <div class="client">
+      <phirepass-sftp-client> </phirepass-sftp-client>
+      <script>
+        const client = document.querySelector('phirepass-sftp-client');
+        console.log(client);
+        client.addEventListener('maximize', event => {
+          console.log('EVENT', event.data);
         });
-    </script>
+      </script>
+    </div>
   </body>
 </html>
