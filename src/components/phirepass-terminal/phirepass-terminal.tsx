@@ -383,6 +383,7 @@ export class PhirepassTerminal {
     }
 
     private handle_error(error: ProtocolMessageWebError) {
+        console.log('Handling protocol error message:', error);
         switch (error.kind) {
             case ProtocolMessageError.Generic:
             case ProtocolMessageError.Authentication:
