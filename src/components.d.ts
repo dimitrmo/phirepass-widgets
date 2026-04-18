@@ -7,6 +7,14 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface PhirepassSftpClient {
+        /**
+          * @default 'Client'
+         */
+        "description": string;
+        /**
+          * @default 'SFTP'
+         */
+        "name": string;
     }
     interface PhirepassTerminal {
         /**
@@ -34,12 +42,27 @@ export namespace Components {
         "token": string;
     }
 }
+export interface PhirepassSftpClientCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLPhirepassSftpClientElement;
+}
 export interface PhirepassTerminalCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLPhirepassTerminalElement;
 }
 declare global {
+    interface HTMLPhirepassSftpClientElementEventMap {
+        "maximize": any;
+    }
     interface HTMLPhirepassSftpClientElement extends Components.PhirepassSftpClient, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLPhirepassSftpClientElementEventMap>(type: K, listener: (this: HTMLPhirepassSftpClientElement, ev: PhirepassSftpClientCustomEvent<HTMLPhirepassSftpClientElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLPhirepassSftpClientElementEventMap>(type: K, listener: (this: HTMLPhirepassSftpClientElement, ev: PhirepassSftpClientCustomEvent<HTMLPhirepassSftpClientElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLPhirepassSftpClientElement: {
         prototype: HTMLPhirepassSftpClientElement;
@@ -71,6 +94,15 @@ declare namespace LocalJSX {
     type OneOf<K extends string, PropT, AttrT = PropT> = { [P in K]: PropT } & { [P in `attr:${K}` | `prop:${K}`]?: never } | { [P in `attr:${K}`]: AttrT } & { [P in K | `prop:${K}`]?: never } | { [P in `prop:${K}`]: PropT } & { [P in K | `attr:${K}`]?: never };
 
     interface PhirepassSftpClient {
+        /**
+          * @default 'Client'
+         */
+        "description"?: string;
+        /**
+          * @default 'SFTP'
+         */
+        "name"?: string;
+        "onMaximize"?: (event: PhirepassSftpClientCustomEvent<any>) => void;
     }
     interface PhirepassTerminal {
         /**
@@ -99,6 +131,10 @@ declare namespace LocalJSX {
         "token": string;
     }
 
+    interface PhirepassSftpClientAttributes {
+        "name": string;
+        "description": string;
+    }
     interface PhirepassTerminalAttributes {
         "serverHost": string;
         "serverPort": number;
@@ -110,7 +146,7 @@ declare namespace LocalJSX {
     }
 
     interface IntrinsicElements {
-        "phirepass-sftp-client": PhirepassSftpClient;
+        "phirepass-sftp-client": Omit<PhirepassSftpClient, keyof PhirepassSftpClientAttributes> & { [K in keyof PhirepassSftpClient & keyof PhirepassSftpClientAttributes]?: PhirepassSftpClient[K] } & { [K in keyof PhirepassSftpClient & keyof PhirepassSftpClientAttributes as `attr:${K}`]?: PhirepassSftpClientAttributes[K] } & { [K in keyof PhirepassSftpClient & keyof PhirepassSftpClientAttributes as `prop:${K}`]?: PhirepassSftpClient[K] };
         "phirepass-terminal": Omit<PhirepassTerminal, keyof PhirepassTerminalAttributes> & { [K in keyof PhirepassTerminal & keyof PhirepassTerminalAttributes]?: PhirepassTerminal[K] } & { [K in keyof PhirepassTerminal & keyof PhirepassTerminalAttributes as `attr:${K}`]?: PhirepassTerminalAttributes[K] } & { [K in keyof PhirepassTerminal & keyof PhirepassTerminalAttributes as `prop:${K}`]?: PhirepassTerminal[K] } & OneOf<"nodeId", PhirepassTerminal["nodeId"], PhirepassTerminalAttributes["nodeId"]> & OneOf<"token", PhirepassTerminal["token"], PhirepassTerminalAttributes["token"]>;
     }
 }
