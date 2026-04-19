@@ -424,8 +424,17 @@ export class PhirepassSftpClient {
     private disconnect_session() {
         this.close_comms();
         this.session_id = undefined;
-        this.status = 'Disconnected';
         this.show_loader = false;
+        this.show_content = false;
+        this.breadcrumbs = [];
+        this.current_dir = '.';
+        this.listing = [];
+        this.show_navigation = false;
+        this.show_login_screen_username = false;
+        this.show_login_screen_password = false;
+        this.show_login_screen = false;
+        this.version = '';
+        this.status = 'Disconnected';
     }
 
     private on_file_row_action(item: SFTPListItem, event: MouseEvent) {
@@ -602,7 +611,7 @@ export class PhirepassSftpClient {
                             <span>{this.status}</span>
                             {this.selected_item && <span class="selected-item">{this.get_full_path(this.selected_item)}</span>}
                         </section>
-                        <section class="version">Version: {this.version}</section>
+                        <section class="version">{this.version ? `Version: ${this.version}` : ''}</section>
                     </footer>
                 </section>
                 {this.show_login_screen &&
