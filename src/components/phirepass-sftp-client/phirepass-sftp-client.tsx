@@ -152,6 +152,9 @@ export class PhirepassSftpClient {
     @State()
     status = 'Disconnected';
 
+    @State()
+    selected_item: SFTPListItem | null = null;
+
     private toggle_max() {
         this.maximizeEvent?.emit(!this.max);
     }
@@ -242,28 +245,27 @@ export class PhirepassSftpClient {
             case ProtocolMessageError.Generic:
             case ProtocolMessageError.Authentication:
                 this.error_message = error.message || 'An unknown error occurred.';
-                this.show_loader = false;
-                this.show_error = true;
                 break;
             case ProtocolMessageError.RequiresUsername:
                 this.show_login_screen_username = true;
                 this.show_login_screen_password = false;
                 this.show_login_screen = true;
-                this.show_loader = false;
                 break;
             case ProtocolMessageError.RequiresPassword:
                 this.show_login_screen_username = false;
                 this.show_login_screen_password = true;
                 this.show_login_screen = true;
-                this.show_loader = false;
                 break;
             case ProtocolMessageError.RequiresUsernamePassword:
                 this.show_login_screen_username = true;
                 this.show_login_screen_password = true;
                 this.show_login_screen = true;
-                this.show_loader = false;
                 break;
         }
+
+        setTimeout(() => {
+            this.show_loader = false;
+        }, 1_000);
     }
 
     private handle_auth_success(auth: ProtocolMessageWebAuthSuccess) {
@@ -283,6 +285,10 @@ export class PhirepassSftpClient {
     }
 
     private handle_sftp_list_items(web: ProtocolMessageWebSFTPListItems) {
+        setTimeout(() => {
+            this.show_loader = false;
+        }, 500);
+
         this.listing = web.dir.items;
         this.current_dir = web.path;
         this.breadcrumbs = web.path.split('/').map((path, index, arr) => {
@@ -292,7 +298,7 @@ export class PhirepassSftpClient {
 
             return { label: path, path: arr.slice(0, index + 1).join('/') };
         });
-        this.show_loader = false;
+
         this.show_content = true;
         this.show_navigation = true;
     }
@@ -385,7 +391,17 @@ export class PhirepassSftpClient {
 
     private list_breadcrumb(path: string) {
         this.show_loader = true;
+        this.selected_item = null;
         this.channel.send_sftp_list_data(this.nodeId, this.session_id!, path);
+    }
+
+    private is_selected(item: SFTPListItem): boolean {
+        if (!this.selected_item) {
+            return false;
+        }
+
+        return this.selected_item.path === item.path &&
+            this.selected_item.name === item.name;
     }
 
     private list_directory(entry: SFTPListItem) {
@@ -396,6 +412,7 @@ export class PhirepassSftpClient {
 
         if (entry.kind === 'File') {
             console.warn('Cannot list directory of a file. Ignoring click.');
+            this.selected_item = entry;
             return;
         }
 
@@ -406,8 +423,13 @@ export class PhirepassSftpClient {
         }
 
         this.show_loader = true;
+        this.selected_item = null;
 
         this.channel.send_sftp_list_data(this.nodeId, this.session_id!, path);
+    }
+
+    private get_full_path(item: SFTPListItem): string {
+        return [item.path, item.name].join('/');
     }
 
     render() {
@@ -457,7 +479,9 @@ export class PhirepassSftpClient {
                                 </thead>
                                 <tbody>
                                     {this.listing.map((item, index) => (
-                                        <tr key={index} onClick={() => this.list_directory(item)}>
+                                        <tr key={index} class={{
+                                            'selected': this.is_selected(item),
+                                        }} onClick={() => this.list_directory(item)}>
                                             <td>
                                                 {item.kind === 'Folder' ? <img class="kind" src={folder} alt="Folder" /> : <img class="kind" src={file} alt="File" />}
                                                 <span class={`name ${item.kind.toLowerCase()}`}>{item.name}</span>
@@ -475,7 +499,10 @@ export class PhirepassSftpClient {
                         {this.show_error && <div class="error">{this.error_message}</div>}
                     </main>
                     <footer>
-                        <section class="status">{this.status}</section>
+                        <section class="status">
+                            <span>{this.status}</span>
+                            {this.selected_item && <span class="selected-item">{this.get_full_path(this.selected_item)}</span>}
+                        </section>
                         <section class="version">Version: {this.version}</section>
                     </footer>
                 </section>
