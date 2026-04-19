@@ -198,6 +198,7 @@
                         padding: 10px 10px;
                         tr {
                             border-bottom: 1px solid hsl(var(--border) / 0.4);
+
                             td {
                                 padding: 10px;
                                 color: hsl(var(--muted-foreground));
@@ -224,6 +225,14 @@
                                 cursor: pointer;
                                 background-color: hsl(var(--muted) / 0.4);
                             }
+
+                            &.selected {
+                                background-color: hsl(var(--primary) / 0.3);
+
+                                &:hover {
+                                    background-color: hsl(var(--primary) / 0.4);
+                                }
+                            }
                         }
                     }
                 }
@@ -244,6 +253,11 @@
             .status {
                 font-size: 0.65rem;
                 color: hsl(var(--muted-foreground));
+
+                .selected-item {
+                    margin-left: 10px;
+                    color: hsl(var(--primary));
+                }
             }
 
             .version {
