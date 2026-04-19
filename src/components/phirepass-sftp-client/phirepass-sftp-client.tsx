@@ -129,6 +129,9 @@ export class PhirepassSftpClient {
     show_navigation = true;
 
     @State()
+    breadcrumbs = [{ label: '/', path: '/' }, { label: 'home', path: '/home' }, { label: 'user', path: '/home/user' }];
+
+    @State()
     show_content = true;
 
     @State()
@@ -350,6 +353,19 @@ export class PhirepassSftpClient {
         this.clear_creds_buffer();
     }
 
+    private list_directory(crumb: any, index: number, breadcrumbs: any[]) {
+        if (index === breadcrumbs.length - 1) {
+            return;
+        }
+
+        if (!this.session_id) {
+            console.warn('No active session. Cannot list directory.');
+            return;
+        }
+
+        this.channel.send_sftp_list_data(this.nodeId, this.session_id!, crumb.path);
+    }
+
     render() {
         return (
             <Host class={{
@@ -376,11 +392,12 @@ export class PhirepassSftpClient {
                     <main>
                         {this.show_navigation && <nav class="navigation">
                             <div class="breadcrumbs">
-                                <span class="breadcrumb">/</span>
-                                <img class="arrow" src={chevron} />
-                                <span class="breadcrumb">home</span>
-                                <img class="arrow" src={chevron} />
-                                <span class="breadcrumb">user</span>
+                                {this.breadcrumbs.map((crumb, index, breadcrumbs) => (
+                                    <>
+                                        <span key={index} onClick={() => this.list_directory(crumb, index, breadcrumbs)} class="breadcrumb">{crumb.label}</span>
+                                        {index < breadcrumbs.length - 1 && <img class="arrow" src={chevron} />}
+                                    </>
+                                ))}
                             </div>
                         </nav>}
                         {this.show_content && <div class="content">
