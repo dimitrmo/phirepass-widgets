@@ -20,7 +20,7 @@ export class PhirepassSftpClient {
     private connected = false;
     // private inputMode: InputMode = InputMode.Default;
 
-    // private session_id?: number;
+    private session_id?: number;
     // private usernameBuffer = "";
     // private passwordBuffer = "";
 
@@ -234,8 +234,9 @@ export class PhirepassSftpClient {
         this.channel.open_sftp_tunnel(this.nodeId);
     }
 
-    private handle_tunnel_opened(_web_: ProtocolMessageWebTunnelOpened) {
-        // this.session_id = web.sid;
+    private handle_tunnel_opened(web: ProtocolMessageWebTunnelOpened) {
+        this.session_id = web.sid;
+        console.log('Tunnel opened with session ID:', this.session_id);
         // this.terminal.reset();
         // this.fit_terminal_safely();
         // this.send_ssh_terminal_resize();
@@ -354,22 +355,44 @@ export class PhirepassSftpClient {
                     'creds': true,
                     'blurred': this.show_login_screen,
                 }}>
-                    {this.show_login_screen && <form class="form">
+                    {this.show_login_screen && <form class="auth" onSubmit={(event) => {
+                        const formData = new FormData(event.target as HTMLFormElement);
+
+                        let username = undefined;
+                        if (this.show_login_screen_username) {
+                            username = formData.get('username') as string;
+                        }
+
+                        let password = undefined;
+                        if (this.show_login_screen_password) {
+                            password = formData.get('password') as string;
+                        }
+
+                        this.channel.open_sftp_tunnel(this.nodeId, username, password);
+
+                        this.show_login_screen_username = false;
+                        this.show_login_screen_password = false;
+                        this.show_login_screen = false;
+                        this.show_loader = true;
+
+                        event.stopPropagation();
+                        event.preventDefault();
+                    }}>
                         <div>SFTP Connection</div>
                         {this.show_login_screen_username &&
                             <div>
                                 <div>Username</div>
-                                <input type="text" placeholder="" />
+                                <input name="username" type="text" placeholder="" />
                             </div>
                         }
                         {this.show_login_screen_password &&
                             <div>
                                 <div>Password</div>
-                                <input type="password" placeholder="" />
+                                <input name="password" type="password" placeholder="" />
                             </div>
                         }
                         <div>
-                            <button>Connect</button>
+                            <button type="submit">Connect</button>
                         </div>
                     </form>}
                 </section>
