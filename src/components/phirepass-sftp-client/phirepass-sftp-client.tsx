@@ -143,6 +143,9 @@ export class PhirepassSftpClient {
     @State()
     show_loader = false;
 
+    @State()
+    version = '';
+
     private toggle_max() {
         this.maximizeEvent?.emit(!this.max);
     }
@@ -256,8 +259,9 @@ export class PhirepassSftpClient {
         }
     }
 
-    private handle_auth_success(_auth_: ProtocolMessageWebAuthSuccess) {
+    private handle_auth_success(auth: ProtocolMessageWebAuthSuccess) {
         this.clear_creds_buffer();
+        this.version = auth.version;
         this.channel.start_heartbeat(this.heartbeatInterval <= 15_000 ? 30_000 : this.heartbeatInterval);
         this.channel.open_sftp_tunnel(this.nodeId);
     }
@@ -422,7 +426,10 @@ export class PhirepassSftpClient {
                         {this.show_loader && <div class="loader">Loading...</div>}
                         {this.show_error && <div class="error">{this.error_message}</div>}
                     </main>
-                    <footer></footer>
+                    <footer>
+                        <section></section>
+                        {this.version && <section class="version">Version: {this.version}</section>}
+                    </footer>
                 </section>
                 {this.show_login_screen &&
                     <section class={{
