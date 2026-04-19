@@ -378,17 +378,17 @@ export class PhirepassSftpClient {
                         event.stopPropagation();
                         event.preventDefault();
                     }}>
-                        <div>SFTP Connection</div>
+                        <div class="title">SFTP Connection</div>
                         {this.show_login_screen_username &&
                             <div>
-                                <div>Username</div>
-                                <input name="username" type="text" placeholder="" />
+                                <label htmlFor="username">Username</label>
+                                <input id="username" autoComplete='off' name="username" type="text" placeholder="" />
                             </div>
                         }
                         {this.show_login_screen_password &&
                             <div>
-                                <div>Password</div>
-                                <input name="password" type="password" placeholder="" />
+                                <label htmlFor="password">Password</label>
+                                <input id="password" autoComplete='off' name="password" type="password" placeholder="" />
                             </div>
                         }
                         <div>

@@ -132,17 +132,53 @@
             display: flex;
             flex-direction: column;
             background: hsl(var(--card));
-            width: 200px;
             position: relative;
             background-color: rgba(21, 24, 30, 0.95);
             border: 1px solid hsl(var(--border));
-            padding: 20px;
+            padding: 36px;
             box-shadow:
                 rgba(0, 0, 0, 0) 0px 0px 0px 0px,
                 rgba(0, 0, 0, 0) 0px 0px 0px 0px,
                 rgba(0, 0, 0, 0.5) 0px 25px 50px -12px;
+            border-radius: var(--radius);
+
+            .title {
+                margin-bottom: 12px;
+                color: hsl(var(--primary));
+            }
+
+            label {
+                font-size: 0.75rem;
+                line-height: 1rem;
+                margin-bottom: 1rem;
+                color: hsl(var(--muted-foreground));
+            }
+
+            input {
+                font-size: 0.875rem;
+                line-height: 1.25rem;
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+                background-color: rgb(28, 31, 38);
+                border-color: rgb(39, 44, 53);
+                border-width: 1px;
+                border-radius: calc(var(--radius) - 2px);
+                width: 100%;
+                margin-bottom: 12px;
+                color: rgb(189, 219, 209);
+                box-sizing: border-box;
+
+                &:focus {
+                    outline: none;
+                    border-color: hsl(var(--primary));
+                    box-shadow: 0 0 0 1px hsl(var(--primary));
+                }
+            }
 
             button[type='submit'] {
+                margin-top: 12px;
                 width: 100%;
                 background-color: hsl(var(--primary));
                 color: hsl(var(--primary-foreground));
