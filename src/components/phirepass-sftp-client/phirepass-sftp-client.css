@@ -110,10 +110,14 @@
                 font-size: 13px;
                 animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
                 text-align: center;
-                height: 100%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                position: absolute;
+                height: 100%;
+                width: 100%;
+                background: rgba(28, 31, 38, 0);
+                backdrop-filter: blur(4px);
             }
 
             .error {
@@ -173,11 +177,56 @@
             }
 
             .content {
-                padding: 10px 10px;
                 font-size: 0.75rem;
                 line-height: 1rem;
-                background-color: hsl(var(--muted) / 0.3);
-                border-bottom: 1px solid hsl(var(--border));
+
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+
+                    thead {
+                        background-color: hsl(var(--muted) / 0.3);
+                        border-bottom: 1px solid hsl(var(--border));
+                        th {
+                            padding: 10px 10px;
+                            text-align: left;
+                            color: hsl(var(--muted-foreground));
+                        }
+                    }
+
+                    tbody {
+                        padding: 10px 10px;
+                        tr {
+                            border-bottom: 1px solid hsl(var(--border) / 0.4);
+                            td {
+                                padding: 10px;
+                                color: hsl(var(--muted-foreground));
+
+                                .name {
+                                    &.file {
+                                        color: rgb(189, 219, 209);
+                                    }
+                                    &.folder {
+                                        color: hsl(var(--primary));
+                                    }
+                                }
+
+                                .kind {
+                                    height: 14px;
+                                    width: 14px;
+                                    margin-right: 5px;
+                                    top: 3px;
+                                    position: relative;
+                                }
+                            }
+
+                            &:hover {
+                                cursor: pointer;
+                                background-color: hsl(var(--muted) / 0.4);
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -191,6 +240,11 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 10px;
+
+            .status {
+                font-size: 0.65rem;
+                color: hsl(var(--muted-foreground));
+            }
 
             .version {
                 font-size: 0.65rem;

@@ -40,6 +40,13 @@ export type SFTPListItem = {
     items: Array<SFTPListItem>;
     attributes: {
         size: number;
+        uid: number;
+        user: string;
+        gid: number;
+        group: string;
+        permissions: number;
+        atime: number;
+        mtime: number;
     };
 };
 

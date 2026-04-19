@@ -5,6 +5,8 @@ import init, { Channel as PhirepassChannel } from 'phirepass-channel';
 import svg from './phirepass-sftp-client.logo.svg';
 import max from './phirepass-sftp-client.max.svg';
 import chevron from './phirepass-sftp-client.chevron.svg';
+import folder from './phirepass-sftp-client.folder.svg';
+import file from './phirepass-sftp-client.file.svg';
 import { ConnectionState, ProtocolMessage, ProtocolMessageError, ProtocolMessageType, ProtocolMessageWebAuthSuccess, ProtocolMessageWebError, ProtocolMessageWebSFTPListItems, ProtocolMessageWebTunnelClosed, ProtocolMessageWebTunnelData, ProtocolMessageWebTunnelOpened, SFTPListItem } from '../../common/protocol';
 
 // https://sweet-sftp-view.lovable.app/
@@ -70,6 +72,7 @@ export class PhirepassSftpClient {
         if (newValue) {
             this.open_comms();
             this.channel.connect();
+            this.status = 'Connecting...';
         }
     }
 
@@ -146,6 +149,9 @@ export class PhirepassSftpClient {
     @State()
     version = '';
 
+    @State()
+    status = 'Disconnected';
+
     private toggle_max() {
         this.maximizeEvent?.emit(!this.max);
     }
@@ -189,6 +195,7 @@ export class PhirepassSftpClient {
     private connect() {
         this.connected = true;
         this.channel.connect();
+        this.status = 'Connecting...';
         // const container = this.containerEl;
         // console.log('Attempting to connect terminal to container:', container);
         // if (container) {
@@ -264,6 +271,7 @@ export class PhirepassSftpClient {
         this.version = auth.version;
         this.channel.start_heartbeat(this.heartbeatInterval <= 15_000 ? 30_000 : this.heartbeatInterval);
         this.channel.open_sftp_tunnel(this.nodeId);
+        this.status = 'Connected';
     }
 
     private handle_tunnel_opened(web: ProtocolMessageWebTunnelOpened) {
@@ -315,19 +323,21 @@ export class PhirepassSftpClient {
         this.channel.on_connection_open(() => {
             this.connectionStateChanged.emit([ConnectionState.Connected]);
             this.channel.authenticate(this.token, this.nodeId);
+            this.status = 'Authenticating...';
         });
 
         this.channel.on_connection_close(() => {
             this.connectionStateChanged.emit([ConnectionState.Disconnected]);
-            // this.terminal.reset();
+            this.status = 'Disconnected';
         });
 
         this.channel.on_connection_error((err: Error) => {
             this.connectionStateChanged.emit([ConnectionState.Error, err]);
+            this.status = 'Error ' + err.message;
         });
 
         this.channel.on_connection_message((_raw_: unknown) => {
-            // console.log('>> raw message received', raw);
+            //
         });
 
         this.channel.on_protocol_message((msg: ProtocolMessage) => {
@@ -373,17 +383,31 @@ export class PhirepassSftpClient {
         this.clear_creds_buffer();
     }
 
-    private list_directory(crumb: any, index: number, breadcrumbs: any[]) {
-        if (index === breadcrumbs.length - 1) {
-            return;
-        }
+    private list_breadcrumb(path: string) {
+        this.show_loader = true;
+        this.channel.send_sftp_list_data(this.nodeId, this.session_id!, path);
+    }
 
+    private list_directory(entry: SFTPListItem) {
         if (!this.session_id) {
             console.warn('No active session. Cannot list directory.');
             return;
         }
 
-        this.channel.send_sftp_list_data(this.nodeId, this.session_id!, crumb.path);
+        if (entry.kind === 'File') {
+            console.warn('Cannot list directory of a file. Ignoring click.');
+            return;
+        }
+
+        const path = [entry.path, entry.name].join('/');
+        if (path === this.current_dir) {
+            console.warn('Already in this directory. Ignoring click.');
+            return;
+        }
+
+        this.show_loader = true;
+
+        this.channel.send_sftp_list_data(this.nodeId, this.session_id!, path);
     }
 
     render() {
@@ -414,21 +438,45 @@ export class PhirepassSftpClient {
                             <div class="breadcrumbs">
                                 {this.breadcrumbs.map((crumb, index, breadcrumbs) => (
                                     <>
-                                        <span key={index} onClick={() => this.list_directory(crumb, index, breadcrumbs)} class="breadcrumb">{crumb.label}</span>
+                                        <span key={index} onClick={() => this.list_breadcrumb(crumb.path)} class="breadcrumb">{crumb.label}</span>
                                         {index < breadcrumbs.length - 1 && <img class="arrow" src={chevron} />}
                                     </>
                                 ))}
                             </div>
                         </nav>}
                         {this.show_content && <div class="content">
-                            {JSON.stringify(this.listing)}
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Size</th>
+                                        <th>Permissions</th>
+                                        <th>Owner</th>
+                                        <th>Modified</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {this.listing.map((item, index, all) => (
+                                        <tr key={index} onClick={() => this.list_directory(item)}>
+                                            <td>
+                                                {item.kind === 'Folder' ? <img class="kind" src={folder} alt="Folder" /> : <img class="kind" src={file} alt="File" />}
+                                                <span class={`name ${item.kind.toLowerCase()}`}>{item.name}</span>
+                                            </td>
+                                            <td>{item.attributes.size}</td>
+                                            <td>{item.attributes.permissions ?? '-'}</td>
+                                            <td>{item.attributes.user ?? '-'}</td>
+                                            <td>{new Date(item.attributes.mtime * 1000).toLocaleString()}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>}
                         {this.show_loader && <div class="loader">Loading...</div>}
                         {this.show_error && <div class="error">{this.error_message}</div>}
                     </main>
                     <footer>
-                        <section></section>
-                        {this.version && <section class="version">Version: {this.version}</section>}
+                        <section class="status">{this.status}</section>
+                        <section class="version">Version: {this.version}</section>
                     </footer>
                 </section>
                 {this.show_login_screen &&
