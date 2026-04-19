@@ -496,7 +496,8 @@
         }
     }
 
-    .upload-modal {
+    .upload-modal,
+    .download-modal {
         position: absolute;
         inset: 0;
         display: none;
@@ -510,7 +511,8 @@
             display: flex;
         }
 
-        .upload-dialog {
+        .upload-dialog,
+        .download-dialog {
             width: min(360px, calc(100% - 24px));
             background-color: rgba(21, 24, 30, 0.96);
             border: 1px solid hsl(var(--border));

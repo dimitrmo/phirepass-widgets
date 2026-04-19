@@ -27,6 +27,7 @@ export class PhirepassSftpClient {
     private connected = false;
     private uploadInputEl?: HTMLInputElement;
     private uploadProgressHandle?: number;
+    private downloadProgressHandle?: number;
     // private inputMode: InputMode = InputMode.Default;
 
     private session_id?: number;
@@ -173,6 +174,18 @@ export class PhirepassSftpClient {
     @State()
     upload_finished = false;
 
+    @State()
+    show_download_modal = false;
+
+    @State()
+    download_progress = 0;
+
+    @State()
+    download_file_name = '';
+
+    @State()
+    download_finished = false;
+
     private toggle_max() {
         this.maximizeEvent?.emit(!this.max);
     }
@@ -210,6 +223,7 @@ export class PhirepassSftpClient {
         this.domReady = false;
         this.runtimeReady = false;
         this.clear_upload_progress();
+        this.clear_download_progress();
         this.close_comms();
         // this.destroy_terminal();
     }
@@ -218,6 +232,13 @@ export class PhirepassSftpClient {
         if (this.uploadProgressHandle !== undefined) {
             window.clearInterval(this.uploadProgressHandle);
             this.uploadProgressHandle = undefined;
+        }
+    }
+
+    private clear_download_progress() {
+        if (this.downloadProgressHandle !== undefined) {
+            window.clearInterval(this.downloadProgressHandle);
+            this.downloadProgressHandle = undefined;
         }
     }
 
@@ -462,7 +483,21 @@ export class PhirepassSftpClient {
         event.preventDefault();
         event.stopPropagation();
         this.selected_item = item;
-        window.alert(`Download for "${item.name}" is not available yet.`);
+        this.download_file_name = item.name;
+        this.download_progress = 0;
+        this.download_finished = false;
+        this.show_download_modal = true;
+
+        this.clear_download_progress();
+        this.downloadProgressHandle = window.setInterval(() => {
+            if (this.download_progress >= 100) {
+                this.clear_download_progress();
+                this.download_finished = true;
+                return;
+            }
+
+            this.download_progress = Math.min(100, this.download_progress + 5);
+        }, 180);
     }
 
     private open_upload_picker() {
@@ -502,6 +537,14 @@ export class PhirepassSftpClient {
         this.upload_progress = 0;
         this.upload_file_name = '';
         this.upload_finished = false;
+    }
+
+    private cancel_download() {
+        this.clear_download_progress();
+        this.show_download_modal = false;
+        this.download_progress = 0;
+        this.download_file_name = '';
+        this.download_finished = false;
     }
 
     private is_selected(item: SFTPListItem): boolean {
@@ -721,6 +764,31 @@ export class PhirepassSftpClient {
                                 onClick={() => this.cancel_upload()}
                             >
                                 {this.upload_finished ? 'Close' : 'Cancel'}
+                            </button>
+                        </div>
+                    </section>
+                }
+                {this.show_download_modal &&
+                    <section class={{
+                        'download-modal': true,
+                        'visible': this.show_download_modal,
+                    }}>
+                        <div class="download-dialog" role="dialog" aria-modal="true" aria-label="Download progress">
+                            <div class="title">Downloading File</div>
+                            <div class="file-name" title={this.download_file_name}>{this.download_file_name}</div>
+                            <div class="progress-track" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={this.download_progress}>
+                                <div class="progress-fill" style={{ width: `${this.download_progress}%` }}></div>
+                            </div>
+                            <div class="progress-value">{this.download_progress}%</div>
+                            <button
+                                type="button"
+                                class={{
+                                    'cancel': true,
+                                    'finished': this.download_finished,
+                                }}
+                                onClick={() => this.cancel_download()}
+                            >
+                                {this.download_finished ? 'Close' : 'Cancel'}
                             </button>
                         </div>
                     </section>
