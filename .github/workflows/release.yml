@@ -12,8 +12,8 @@ concurrency:
 env:
     CI: true
     CARGO_TERM_COLOR: always
-    CARGO_TAG_NAME: "GitHub Actions"
-    CARGO_TAG_EMAIL: "github-actions@users.noreply.github.com"
+    CARGO_TAG_NAME: 'GitHub Actions'
+    CARGO_TAG_EMAIL: 'github-actions@users.noreply.github.com'
     OPENSSL_STATIC: 1
     OPENSSL_NO_VENDOR: 0
 
@@ -23,7 +23,7 @@ permissions:
 
 jobs:
     Build:
-        runs-on: ubuntu-latest
+        runs-on: self-hosted
         steps:
             - uses: actions/checkout@v6
 
@@ -34,7 +34,7 @@ jobs:
 
             - uses: oven-sh/setup-bun@v2
               with:
-                bun-version: latest
+                  bun-version: latest
 
             - name: Set up Node.js
               uses: actions/setup-node@v6
@@ -58,7 +58,7 @@ jobs:
 
                   npm publish --provenance --access public
               env:
-                NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH }}
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH }}
 
             - name: Extract git branch
               run: |
