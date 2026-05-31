@@ -58,7 +58,7 @@ jobs:
 
                   npm publish --provenance --access public
               env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH }}
+                  NODE_AUTH_TOKEN: ${{ secrets.PAT_GITHUB_PUBLISH_ALL }}
 
             - name: Extract git branch
               run: |
